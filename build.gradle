@@ -1,0 +1,40 @@
+apply plugin: 'java'
+apply plugin: 'idea'
+
+group 'SK1'
+
+version '0.0.1'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+compileJava.options.encoding = 'UTF-8'
+
+repositories {
+    flatDir {
+        dirs '../sk-libs'
+    }
+
+    mavenCentral()
+}
+
+libsDirName = '../../sk-libs'
+
+task uberJar(type: Jar) {
+    version = (findProperty('sk_drive_app_version'))
+
+    from sourceSets.main.output
+
+    dependsOn configurations.runtimeClasspath
+    from {
+        configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
+    }
+
+    manifest {
+        attributes 'Main-Class': 'app.Main'
+    }
+}
+
+dependencies {
+    compile name: 'sk-local-0.0.1'
+}
